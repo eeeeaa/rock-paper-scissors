@@ -11,10 +11,10 @@
  * PLAYROUND
  *      WHEN got player choice and computer choice
  *      THEN compare player choice and computer choice based on rule set
- *      print winner string
+ *      store score for player and computer
+ *      return string
  * 
  * GAME
- *      store score for player and computer
  *      LOOP PLAYROUND 5 times
  *      compare scores and print winner name
  * END
