@@ -1,106 +1,86 @@
 /***
- * GUI: console log
+ * GUI: UI button
  * Input: player choice, computer choice
  * Output: Determine winner or loser
- * 
- * START
- * get player choice with type string from input
- * convert player choice to lower case
- * get computer choice randomly
- * 
- * PLAYROUND
- *      WHEN got player choice and computer choice
- *      THEN compare player choice and computer choice based on rule set
- *      store score for player and computer
- *      return string
- * 
- * GAME
- *      LOOP PLAYROUND 5 times
- *      compare scores and print winner name
  * END
  */
 
 const validMove = ["rock","paper","scissors"];
+const displayOutput = document.querySelector('#result');
+let roundCount = 1;
 let playerScore = 0;
 let computerScore = 0;
 
-function getPlayerChoice(){
-    let input = prompt("Rock, Paper, or Scissors?");
-    if (typeof input == "string"){
-        return input.toLowerCase();
-    }else{
-        return "";
+function endGame(){
+    displayOutput.innerHTML = `
+    <br> Game end! </br>
+    <br> Your score : ${playerScore}</br>
+    <br> computer score : ${computerScore} </br>
+    `
+
+    if(playerScore > computerScore){
+        displayOutput.innerHTML += `<br>You Win!</br>`;
+    } else if (playerScore === computerScore){
+        displayOutput.innerHTML += `<br>Game tied!</br>`;
+    } else {
+        displayOutput.innerHTML += `<br>You lose!</br>`;
     }
+
+    roundCount = 1;
+    playerScore = 0;
+    computerScore = 0;
 }
-function getComputerChoice(){
+
+function getComputerChoiceIndex(){
     let choiceIndex = Math.floor(Math.random() * 3);
-    return validMove[choiceIndex];
+    return choiceIndex;
 }
 
-function playRound(playerSelection, computerSelection){
-    if(playerSelection === computerSelection){
-        return "You tied!"
-    } else {
-        switch(playerSelection){
-            case validMove[0]:
-                if(computerSelection === validMove[1]){
-                    computerScore += 1;
-                    return "You Lose! Paper beats Rock";
-                } else {
-                    playerScore += 1;
-                    return "You Win! Rock beats scissors";
-                }
-                break;
-            case validMove[1]:
-                if(computerSelection === validMove[2]){
-                    computerScore += 1;
-                    return "You Lose! Scissors beats paper";
-                    
-                } else {
-                    playerScore += 1;
-                    return "You Win! Paper beats Rock";
-                }
-                break;
-            case validMove[2]:
-                if(computerSelection === validMove[0]){
-                    computerScore += 1;
-                    return "You Lose! Rock beats Scissors";
-                } else {
-                    playerScore += 1;
-                    return "You Win! Scissors beats paper";
-                }
-                break;
+function playRound(playerIndex, computerIndex){
+    if(roundCount == 5){
+        endGame();
+        return;
+    }
+    const resultMatrix =   [[0,1,2], //0 = tie, 1 = lose, 2 = win
+                            [2,0,1],
+                            [1,2,0]];
+    
+    displayOutput.innerHTML = 
+    `<br>Player choice: ${validMove[playerIndex]}</br>
+    <br>Computer choice: ${validMove[computerIndex]}</br>`;
+
+    switch(resultMatrix[playerIndex][computerIndex]) {
+        case 0:{
+            displayOutput.innerHTML += `<br>You tied!</br>`; 
+            break; 
+        } 
+        case 1: {
+            computerScore++;
+            displayOutput.innerHTML += `<br>You Lose! ${validMove[computerIndex]} beats ${validMove[playerIndex]}</br>`;
+            break;
+        }
+        case 2: {
+            playerScore++;
+            displayOutput.innerHTML += `<br>You Win! ${validMove[playerIndex]} beats ${validMove[computerIndex]}</br>`;
+            break;
         }
     }
+    roundCount++;
 }
 
-function game(){
-    for(i = 1; i <= 5; i++){
-        let player = getPlayerChoice();
-        let computer = getComputerChoice();
-        
-        if(validMove.find((element) => element === player) === undefined){
-            console.log("Illegal move!"); 
-            return;
-        }
-
-        console.log(`player play ${player}`);
-        console.log(`computer play ${computer}`);
-
-        console.log(playRound(player, computer));
-        console.log(`current score: 
-        current round: ${i}
-        player - ${playerScore} 
-        computer - ${computerScore}`);
+function initializeGame(){
+    const displayChoices = document.querySelector('#choices');
+    for(let i = 0; i < validMove.length; i++){
+        let button = document.createElement('button');
+        button.textContent = validMove[i];
+        button.addEventListener('click', () => {
+            console.log(`player click ${validMove[i]}`);
+            playRound(i, getComputerChoiceIndex());
+        });
+        displayChoices.appendChild(button);
     }
-
-    if(playerScore === computerScore){
-        console.log("Player tie for this game!");
-    } else if (playerScore > computerScore) {
-        console.log("Player win this game!");
-    } else {
-        console.log("Computer win this game!");
-    }
+    displayOutput.textContent = "Output show here!";
 }
 
-game();
+
+initializeGame();
